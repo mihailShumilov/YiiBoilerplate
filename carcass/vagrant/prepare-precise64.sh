@@ -52,4 +52,14 @@ ln -sn ../conf-available/globalname.conf globalname.conf
 # Creating database
 mysql -u root -p${DB_PASS} -e "create database if not exists ${DB_NAME}";
 
+#setup ssl
+openssl req -new -x509 -days 30 -keyout server.key -out server.pem
+cp server.key{,.orig}
+openssl rsa -in server.key.orig -out server.key
+rm server.key.orig
+cp server.pem /etc/ssl/certs/
+cp server.key /etc/ssl/private/
+chmod 0600 /etc/ssl/private/server.key
+a2enmod ssl
+a2ensite default-ssl
 
