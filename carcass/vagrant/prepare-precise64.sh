@@ -37,7 +37,7 @@ rm -rf /etc/apache2/sites-enabled/*
 # Enabling mod_rewrite on server
 ## `cd` is just for symlink to have same format as others inside `mods-enabled/`
 cd /etc/apache2/mods-enabled/
-ln -s ../mods-available/rewrite.load rewrite.load
+ln -sn ../mods-available/rewrite.load rewrite.load
 
 # Make the apache load under our user account.
 sed -ri 's/^(export APACHE_RUN_USER=)(.*)$/\1vagrant/' /etc/apache2/envvars
@@ -47,9 +47,18 @@ sed -ri 's/^(export APACHE_RUN_GROUP=)(.*)$/\1vagrant/' /etc/apache2/envvars
 touch /etc/apache2/conf-available/globalname.conf
 echo "ServerName boilerplate" > /etc/apache2/conf-available/globalname.conf
 cd /etc/apache2/conf-enabled
-ln -s ../conf-available/globalname.conf globalname.conf
+ln -sn ../conf-available/globalname.conf globalname.conf
 
 # Creating database
 mysql -u root -p${DB_PASS} -e "create database if not exists ${DB_NAME}";
 
-
+#setup ssl
+openssl req -new -x509 -days 30 -keyout server.key -out server.pem
+cp server.key{,.orig}
+openssl rsa -in server.key.orig -out server.key
+rm server.key.orig
+cp server.pem /etc/ssl/certs/
+cp server.key /etc/ssl/private/
+chmod 0600 /etc/ssl/private/server.key
+a2enmod ssl
+a2ensite default-ssl
