@@ -108,7 +108,7 @@ EOD;
     {
         foreach ($this->config_dirs as $dir)
         {
-            $source = "{$dir}/environments/{$id}.php";
+            $source = "{$dir}/overrides/{$id}.php";
             if(!file_exists($source))
             {
                 Console::output(
